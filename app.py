@@ -7,6 +7,11 @@ import time
 from io import BytesIO
 from PIL import Image
 from roboflow import Roboflow
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -14,9 +19,9 @@ app = Flask(__name__)
 cap = cv2.VideoCapture(0)
 
 # Initialize Roboflow model
-rf = Roboflow(api_key="Oj8rbnsYxkC2M303mMMJ")
-project = rf.workspace().project("caisse-verfication")
-model = project.version(3).model
+rf = Roboflow(api_key=os.getenv('ROBOFLOW_API_KEY'))
+project = rf.workspace().project(os.getenv('ROBOFLOW_PROJECT'))
+model = project.version(int(os.getenv('ROBOFLOW_VERSION'))).model
 
 def generate_frames():
     while True:
@@ -72,9 +77,9 @@ def process_frame(frame):
             nonlocal api_predictions, api_time
             api_start = time.time()
             response = requests.post(
-                "https://detect.roboflow.com/caisse-verfication/3",
+                f"{os.getenv('ROBOFLOW_API_URL')}/{os.getenv('ROBOFLOW_PROJECT')}/{os.getenv('ROBOFLOW_VERSION')}",
                 data=img_base64,
-                params={"api_key": "Oj8rbnsYxkC2M303mMMJ"},
+                params={"api_key": os.getenv('ROBOFLOW_API_KEY')},
                 headers={'Content-Type': 'application/x-www-form-urlencoded'}
             )
             api_predictions = response.json()
