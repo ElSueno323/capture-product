@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Fonteyne The Kitchen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --hover-blue: #1e4620;
+            --light-blue: #e8f0fe;
+        }
+
+        body {
+            background-color: var(--light-blue);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .menu-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-blue);
+            box-shadow: 0 8px 15px rgba(30, 58, 138, 0.2);
+        }
+
+        .menu-icon {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .menu-title {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        button{
+            height: 100%;
+            width: 100%;
+            background-color: transparent;
+            border: transparent;
+        }
+        .selected-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 0.5rem;
+        }
+        
+        .cart-item h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Fonteyne The Kitchen</h1>
+    </div>
+
+    <div class="menu-container">
+        <div class="menu-grid">
+        </div>
+    </div>
+
+    <div class="cart-container">
+        <h2 class="text-center mb-4">Liste des éléments sélectionnés</h2>
+        <div id="selected-items" class =" d-flex align-items-center">
+        </div>
+    </div>
+
+    
+    <button id="payButton" class="btn btn-primary btn-lg mt-4" style="display: block; margin: 0 auto;">
+        Payer
+    </button>
+
+    <script>
+        document.getElementById('payButton').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/compare', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Array.from(itemCountMap.keys()))
+                });
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    document.documentElement.innerHTML = html;
+                } else {
+                    console.error('Erreur lors de la requête');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        });
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    itemCountMap = new Map();
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const response = await fetch('/items');
+            const data = await response.json();
+            const menuGrid = document.querySelector('.menu-grid');
+            const selectedItemsList = document.getElementById('selected-items');
+            
+            // Créer une Map pour stocker les éléments et leur quantité
+            //const itemCountMap = new Map();
+            
+            // Vider la grille existante
+            menuGrid.innerHTML = '';
+            
+            // Créer un bouton pour chaque élément
+            document.getElementById('selected-items').innerHTML = '';
+            data.items.forEach(item => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.innerHTML = `
+                    <button>
+                        <i class="fas fa-box menu-icon"></i>
+                        <h2 class="menu-title">${item.name.toUpperCase()}</h2>
+                        <div>${item.price}€ </div>
+                    </button>
+                `;
+                
+                menuItem.querySelector('button').addEventListener('click', () => {
+
+                    const count = itemCountMap.get(item.name) || 0;
+                    itemCountMap.set(item.name, count + 1);
+                    
+                    const listItem = document.createElement('div');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.innerHTML = `
+                    <div class="cart-item">
+                        <h3>${item.name}</h3>
+                        <button class="btn btn-danger btn-sm" onclick="removeItem(this, '${item.name}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    `;
+                    selectedItemsList.appendChild(listItem);
+                });
+                
+                menuGrid.appendChild(menuItem);
+            });
+            
+            // Fonction pour supprimer un élément
+            window.removeItem = function(button, itemName) {
+                const count = itemCountMap.get(itemName);
+                if (count > 1) {
+                    itemCountMap.set(itemName, count - 1);
+                    const parentItem = button.closest('.cart-item');
+                    parentItem.querySelector('h3').textContent = `${itemName} (${count - 1})`;
+                } else {
+                    itemCountMap.delete(itemName);
+                    button.closest('.list-group-item').remove();
+                }
+            };
+            
+        } catch (error) {
+            console.error('Erreur lors du chargement des éléments:', error);
+        }
+    });
+    </script>
+</body>
+
+</html>
