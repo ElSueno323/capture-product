@@ -76,7 +76,7 @@
         .header {
             background: var(--primary-blue);
             color: white;
-            padding: 2rem;
+            padding: 1rem;
             text-align: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -219,7 +219,6 @@
                     itemCountMap.set(item.name, count + 1);
                     
                     const listItem = document.createElement('div');
-                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
                     listItem.innerHTML = `
                     <div class="cart-item">
                         <h3>${item.name}</h3>
