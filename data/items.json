@@ -2,11 +2,13 @@
     "items": [
         {
             "name": "Mate",
-            "price": 3.50
+            "price": 3.50,
+            "url":" "
         },
         {
             "name": "Peche",
-            "price": 1.50
+            "price": 1.50,
+            "url":" "
         },
         {
             "name": "Salade",
@@ -22,7 +24,8 @@
         },
         {
             "name": "livre",
-            "price": 0.50
+            "price": 0.50,
+            "url":" "
         },
         {
             "name": "mixvoip",

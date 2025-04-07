@@ -207,9 +207,10 @@
                 menuItem.className = 'menu-item';
                 menuItem.innerHTML = `
                     <button>
-                        <i class="fas fa-box menu-icon"></i>
+                        <i class="fas fa-box menu-icon" id="default-icon-${item.name}"></i>
                         <h2 class="menu-title">${item.name.toUpperCase()}</h2>
                         <div>${item.price}€ </div>
+                        <img src="./src/${item.name.toLowerCase()}.jpg" class="img-fluid" document.getElementById('default-icon-${item.name}').style.display='block';" onload="document.getElementById('default-icon-${item.name}').style.display='none';">
                     </button>
                 `;
                 
@@ -254,6 +255,13 @@
     function toggleDetails() {
             const detailsSection = document.querySelector('.detail_predilections');
             detailsSection.classList.toggle('show');
+        }
+
+        function refreshAndRedirect() {
+            location.reload();
+            setTimeout(() => {
+                window.location.href = '/menu';
+            }, 100);
         }
     </script>
 </body>
