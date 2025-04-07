@@ -153,6 +153,7 @@ def compare():
         # Convert processed frame to base64 for sending to frontend
         _, buffer = cv2.imencode('.jpg', processed_frame)
         img_base64 = base64.b64encode(buffer).decode('utf-8')
+        img_data = f'data:image/jpeg;base64,{img_base64}'
         
         # Extraire les prédictions de l'API
         api_predictions = predictions.get('api_predictions', {})
@@ -164,7 +165,7 @@ def compare():
         equal = comparare_items(cart, predictions_array)
 
         print("Predictions from API:", predictions_array)
-        return render_template('compare.html', predictions=predictions_array, cart=cart, equal=equal)
+        return render_template('compare.html', predictions=predictions_array, cart=cart, equal=equal, image=img_data)
     
     return jsonify({'status': 'error', 'message': 'Failed to capture image'})
 
