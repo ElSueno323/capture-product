@@ -19,6 +19,7 @@ app = Flask(__name__)
 
 # Initialize video capture
 cap = cv2.VideoCapture(0)
+
 def generate_frames():
     while True:
         success, frame = cap.read()
@@ -52,6 +53,8 @@ def process_frame(frame):
     
     # Save frame temporarily for local 
     temp_path = 'temp_frame.jpg'
+    if os.path.exists(temp_path):
+        os.remove(temp_path)
     cv2.imwrite(temp_path, frame)
     
     # Convert frame to base64 for API
@@ -146,7 +149,16 @@ def items():
 @app.route('/compare', methods=['POST'])
 def compare():
     cart = request.get_json()
-    success, frame = cap.read()
+    success = False
+    
+    init_time = time.time()
+    for i in range(7):
+        start_time = time.time()
+        success, frame = cap.read()
+        capture_time = time.time() - start_time
+        print(f"Tentative {i+1}: Temps de capture = {capture_time:.3f} secondes | Succès: {success}")
+    print(f"Temps total de capture = {time.time() - init_time:.3f} secondes")
+    
     if success:
         processed_frame, predictions = process_frame(frame)
         
