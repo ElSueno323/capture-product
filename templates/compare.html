@@ -7,44 +7,81 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #4a4a4a;
+            --hover-color: #666666;
+            --background-color: #e5e5e5;
+            --border-color: #d1d1d1;
+            --success-color: #4a8b4a;
+            --error-color: #8b4a4a;
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            background-color: var(--background-color);
+            min-height: 100vh;
+        }
+
         .comparison-container {
             display: flex;
             justify-content: space-between;
             margin: 20px 0;
             gap: 20px;
+            margin-left: 320px;
+            padding: 2rem;
         }
+
         .list-container {
             flex: 1;
             background: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            max-width: 600px;
         }
+
         .item-match {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
+            background-color: rgba(74, 139, 74, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
         }
+
         .item-mismatch {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
+            background-color: rgba(139, 74, 74, 0.1);
+            border-color: var(--error-color);
+            color: var(--error-color);
         }
+
         .item {
             padding: 10px;
             margin: 5px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
         }
+
         .detail_predilections {
             display: none;
         }
+
         .detail_predilections.show {
             display: block;
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>Comparaison Panier et Prédictions</h1>
+    </div>
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Comparaison Panier et Prédictions</h1>
         
         <div class="comparison-container">
             <div class="list-container">
@@ -85,8 +122,8 @@
                     Le scan ne correspond pas au contenu du panier. Veuillez réessayer.
                 </div>
             {% endif %}
-            <button class="btn btn-primary btn-lg" onclick="toggleDetails()">
-                Debug
+            <button class="btn btn-lg" onclick="toggleDetails()" style="background-color: var(--primary-color); color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 8px; transition: all 0.3s ease;">
+                <i class="fas fa-bug me-2"></i>Debug
             </button>
             <div class="detail_predilections mt-4">
                 <div class="row">
@@ -131,7 +168,9 @@
         </div>
 
         <div class="text-center mt-4">
-            <button class="btn btn-primary btn-lg" onclick="window.location.href='/menu'">Retour au menu</button>
+            <button class="btn btn-lg" onclick="window.location.href='/menu'" style="background-color: var(--primary-color); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; transition: all 0.3s ease;">
+                <i class="fas fa-arrow-left me-2"></i>Retour au menu
+            </button>
         </div>
     </div>
 

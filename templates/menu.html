@@ -9,22 +9,57 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-blue: #1e3a8a;
-            --hover-blue: #1e4620;
-            --light-blue: #e8f0fe;
+            --primary-color: #4a4a4a;
+            --hover-color: #666666;
+            --background-color: #e5e5e5;
+            --border-color: #d1d1d1;
         }
 
         body {
-            background-color: var(--light-blue);
-            min-height: 100vh;
+            background-color: var(--background-color);
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
         .menu-container {
-            max-width: 1800px;
-            margin: 0 2rem 2rem 2rem;
-            padding: 2rem;
+            margin-left: 300px;
+            padding: 1rem;
+            height: calc(100vh - 72px);
+            overflow-y: auto;
+        }
+
+        .cart-container {
+            position: fixed;
+            left: 0;
+            top: 72px;
+            bottom: 0;
+            width: 300px;
+            background: #f5f5f5;
+            padding: 1rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            z-index: 1000;
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
         }
 
         .menu-grid {
@@ -40,9 +75,9 @@
             padding: 2rem;
             text-align: center;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
             flex: 1 1 300px;
@@ -56,29 +91,79 @@
 
         .menu-item:hover {
             transform: translateY(-5px);
-            border-color: var(--primary-blue);
-            box-shadow: 0 8px 15px rgba(30, 58, 138, 0.2);
+            border-color: var(--hover-color);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
 
         .menu-icon {
             font-size: 3rem;
-            color: var(--primary-blue);
+            color: var(--primary-color);
             margin-bottom: 1rem;
         }
 
         .menu-title {
-            color: var(--primary-blue);
+            color: var(--primary-color);
             font-size: 1.5rem;
             font-weight: bold;
             margin: 1rem 0;
         }
 
         .header {
-            background: var(--primary-blue);
+            background: var(--primary-color);
             color: white;
             padding: 1rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .logo-container {
+            flex: 0 0 auto;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 1rem;
+            position: relative;
+        }
+
+        .search-toggle {
+            background: #666;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .search-button {
+            background: #666;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
         .header h1 {
@@ -124,7 +209,11 @@
 
 <body>
     <div class="header">
-        <h1>Fonteyne The Kitchen</h1>
+        <div class="logo-container">
+            <img src="/static/images/logo.svg" alt="Fonteyne The Kitchen" class="logo">
+        </div>
+        <div class="search-container">
+        </div>
     </div>
 
     <div class="menu-container">
@@ -133,18 +222,30 @@
     </div>
 
     <div class="cart-container">
-        <h2 class="text-center mb-4">Liste des éléments sélectionnés</h2>
-        <div id="selected-items" class =" d-flex align-items-center">
+        <h2 class="mb-4">Votre panier</h2>
+        <div id="selected-items" class="d-flex flex-column gap-2">
+            <div class="cart-empty-message text-center py-4">
+                <i class="fas fa-shopping-cart mb-3" style="font-size: 2rem; color: #666;"></i>
+                <p>Votre panier est vide</p>
+            </div>
         </div>
+        <button id="payButton" class="btn btn-lg mt-auto" style="display: flex; align-items: center; justify-content: center; gap: 1rem; background-color: var(--primary-color); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; transition: all 0.3s ease;">
+            <span>Paiement</span>
+            <i class="fas fa-arrow-right"></i>
+        </button>
     </div>
     <style>
         .cart-container {
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            margin: 2rem auto;
-            max-width: 1200px;
-            box-shadow: 0 4px 6px rgba(199, 0, 57, 0.1);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 300px;
+            background: #f5f5f5;
+            padding: 1rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
         }
         
         .cart-container h2 {
@@ -155,10 +256,7 @@
         }
     </style>
 
-    
-    <button id="payButton" class="btn btn-lg mt-4" style="display: block; margin: 0 auto; background-color: var(--primary-blue); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; transition: all 0.3s ease;">
-        <i class="fas fa-shopping-cart me-2"></i> Payer
-    </button>
+
 
     <script>
         document.getElementById('payButton').addEventListener('click', async () => {
@@ -186,7 +284,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    itemCountMap = new Map();
+        itemCountMap = new Map();
     document.addEventListener('DOMContentLoaded', async function() {
         try {
             const response = await fetch('/items');
@@ -194,14 +292,14 @@
             const menuGrid = document.querySelector('.menu-grid');
             const selectedItemsList = document.getElementById('selected-items');
             
-            // Créer une Map pour stocker les éléments et leur quantité
-            //const itemCountMap = new Map();
+            // Initialize cart data from localStorage
+            let cartData = JSON.parse(localStorage.getItem('cartData') || '{}');
             
-            // Vider la grille existante
+            // Clear existing grid and selected items
             menuGrid.innerHTML = '';
+            selectedItemsList.innerHTML = '';
             
-            // Créer un bouton pour chaque élément
-            document.getElementById('selected-items').innerHTML = '';
+            // Create menu items
             data.items.forEach(item => {
                 const menuItem = document.createElement('div');
                 menuItem.className = 'menu-item';
@@ -210,42 +308,60 @@
                         <i class="fas fa-box menu-icon" id="default-icon-${item.name}"></i>
                         <h2 class="menu-title">${item.name.toUpperCase()}</h2>
                         <div>${item.price}€ </div>
-                        <img src="./src/${item.name.toLowerCase()}.jpg" class="img-fluid" document.getElementById('default-icon-${item.name}').style.display='block';" onload="document.getElementById('default-icon-${item.name}').style.display='none';">
                     </button>
                 `;
                 
                 menuItem.querySelector('button').addEventListener('click', () => {
+                    cartData[item.id] = (cartData[item.id] || 0) + 1;
+
 
                     const count = itemCountMap.get(item.name) || 0;
                     itemCountMap.set(item.name, count + 1);
-                    
-                    const listItem = document.createElement('div');
-                    listItem.innerHTML = `
-                    <div class="cart-item">
-                        <h3>${item.name}</h3>
-                        <button class="btn btn-danger btn-sm" onclick="removeItem(this, '${item.name}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    `;
-                    selectedItemsList.appendChild(listItem);
+                    updateCart();
                 });
                 
                 menuGrid.appendChild(menuItem);
             });
             
-            // Fonction pour supprimer un élément
-            window.removeItem = function(button, itemName) {
-                const count = itemCountMap.get(itemName);
-                if (count > 1) {
-                    itemCountMap.set(itemName, count - 1);
-                    const parentItem = button.closest('.cart-item');
-                    parentItem.querySelector('h3').textContent = `${itemName} (${count - 1})`;
+            function updateCart() {
+                selectedItemsList.innerHTML = '';
+                let hasItems = false;
+                
+                itemCountMap.forEach((quantity, itemName) => {
+                    hasItems = true;
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <h3>${itemName} (${quantity})</h3>
+                        <button class="btn btn-danger btn-sm" onclick="removeItem('${itemName}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                    selectedItemsList.appendChild(cartItem);
+                });
+                
+                if (!hasItems) {
+                    selectedItemsList.innerHTML = `
+                        <div class="cart-empty-message text-center py-4">
+                            <i class="fas fa-shopping-cart mb-3" style="font-size: 2rem; color: #666;"></i>
+                            <p>Votre panier est vide</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            window.removeItem = function(itemName) {
+                const currentQuantity = itemCountMap.get(itemName);
+                if (currentQuantity > 1) {
+                    itemCountMap.set(itemName, currentQuantity - 1);
                 } else {
                     itemCountMap.delete(itemName);
-                    button.closest('.list-group-item').remove();
                 }
+                updateCart();
             };
+            
+            // Initial cart update
+            updateCart();
             
         } catch (error) {
             console.error('Erreur lors du chargement des éléments:', error);
