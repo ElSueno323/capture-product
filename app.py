@@ -1,5 +1,5 @@
 from cv2.gapi import render
-from flask import Flask, render_template, Response,request, jsonify
+from flask import Flask, render_template, Response,request, jsonify, g
 import cv2
 import base64
 import requests
@@ -13,12 +13,25 @@ import os
 import threading
 
 # Load environment variables
-load_dotenv()
+
 
 app = Flask(__name__)
 
 # Initialize video capture
-cap = cv2.VideoCapture(0)
+
+
+def findVideoSource():
+    for i in range(3):
+        cap = cv2.VideoCapture(i)
+        if cap.isOpened():
+            print(f"Camera index {i} found")
+            cap.release()
+            return cv2.VideoCapture(i)
+    else:
+        print("No camera found")
+        return None
+
+cap = findVideoSource()   
 
 def generate_frames():
     while True:
@@ -44,7 +57,7 @@ def process_frame(frame):
     
     # Resize image to reduce size while maintaining aspect ratio
     height, width = frame.shape[:2]
-    max_dimension = 800
+    max_dimension = 1080
     scale = max_dimension / max(height, width)
     if scale < 1:
         new_width = int(width * scale)
@@ -65,13 +78,10 @@ def process_frame(frame):
     
     try:
         # Variables pour stocker les résultats des threads
-        local_predictions = None
         api_predictions = None
         local_time = 0
         api_time = 0
-        
 
-        
         # Fonction pour l'inférence API
         def api_inference():
             nonlocal api_predictions, api_time
@@ -113,14 +123,12 @@ def process_frame(frame):
         
         timing_info = {
             'preprocessing_time': preprocessing_time,
-            'local_inference_time': local_time,
             'api_inference_time': api_time,
             'total_time': total_time,
             'time_difference': abs(local_time - api_time)
         }
         
         return frame_with_predictions, {
-            'local_predictions': api_predictions,
             'api_predictions': api_predictions,
             'timing': timing_info
         }
@@ -181,6 +189,20 @@ def compare():
     
     return jsonify({'status': 'error', 'message': 'Failed to capture image'})
 
+@app.route('/fast_compare')
+def test():
+    image_path = 'test_item.jpg'
+    frame = cv2.imread(image_path)
+    memory_size = frame.nbytes
+    proced_frame,predilection = process_frame(frame)
+    image_size=os.path.getsize(image_path)
+    size_image= {
+        "kb":image_size/1024,
+        "mb":image_size/1024/1024,
+        "memory_size": memory_size,
+        }
+    return jsonify({'predictions':predilection},{'size_image':size_image})
+
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(),
@@ -204,5 +226,20 @@ def capture():
     
     return jsonify({'status': 'error', 'message': 'Failed to capture image'})
 
+@app.before_request
+def start_timer():
+    g.start_time = time.time()
+    g.request_size = int(request.content_length or 0)
+
+@app.after_request
+def log_bandwidth_usage(response):
+    duration = time.time() - g.start_time
+    response_size = response.calculate_content_length()
+    total = (g.request_size or 0) + (response_size or 0)
+    print(f"[BANDWIDTH] {request.method} {request.path} | Requête: {g.request_size} B | Réponse: {response_size} B | Total: {total / 1024:.2f} KB | Temps: {duration:.2f}s")
+    return response
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    load_dotenv()
+
+    app.run(debug=False, port=int(os.getenv('PORT',5002)))
