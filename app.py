@@ -146,6 +146,7 @@ def process_frame(frame):
         print(f"Error processing image: {str(e)}")
         return frame, {"error": str(e)}
 
+# Load items from JSON file because we need to have upgrade roboflow for api classes
 def load_items():
     with open("data/items.json", "r", encoding="utf-8") as file:
         return json.load(file)

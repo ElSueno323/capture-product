@@ -1,55 +1,17 @@
 {
     "items": [
-        {
-            "name": "Mate",
-            "price": 3.50,
-            "url":" "
-        },
-        {
-            "name": "Peche",
-            "price": 1.50,
-            "url":" "
-        },
-        {
-            "name": "Salade",
-            "price": 3.00
-        },
-        {
-            "name": "cafe",
-            "price": 2.50
-        },
-        {
-            "name": "coca",
-            "price": 1.00
-        },
-        {
-            "name": "livre",
-            "price": 0.50,
-            "url":" "
-        },
-        {
-            "name": "mixvoip",
-            "price": 3.50
-        },
-        {
-            "name": "plate",
-            "price": 2.50
-        },
-        {
-            "name": "porcelaine",
-            "price": 3.50
-        },
-        {
-            "name": "prise",
-            "price": 1.50
-        },
-        {
-            "name": "raspby",
-            "price": 2.50
-        },
-        {
-            "name": "rondale",
-            "price": 1.00
-        }
-    ]
+        { "id": 0, "name": "Mate", "price": 1.80 },
+        { "id": 1, "name": "Peche", "price": 1.50 },
+        { "id": 2, "name": "capsule-cafe", "price": 0.40 },
+        { "id": 3, "name": "coca", "price": 1.20 },
+        { "id": 4, "name": "kraft-grand", "price": 3.50 },
+        { "id": 5, "name": "kraft-grand-jour", "price": 3.80 },
+        { "id": 6, "name": "kraft-moyen", "price": 2.50 },
+        { "id": 7, "name": "livre", "price": 8.90 },
+        { "id": 8, "name": "mixvoip", "price": 0.00 },
+        { "id": 9, "name": "plate", "price": 4.20 },
+        { "id": 10, "name": "raspby", "price": 35.00 },
+        { "id": 11, "name": "soup", "price": 2.30 }
+      ]
+      
 }
