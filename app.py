@@ -25,8 +25,10 @@ def findVideoSource():
         cap = cv2.VideoCapture(i)
         if cap.isOpened():
             print(f"Camera index {i} found")
-            cap.release()
-            return cv2.VideoCapture(i)
+            cap.set(cv2.CAP_PROP_AUTOFOCUS,1)
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768) #format for image 
+            return cap
     else:
         print("No camera found")
         return None
@@ -37,6 +39,7 @@ def generate_frames():
     while True:
         success, frame = cap.read()
         if not success:
+            print("Failed to capture image")
             break
         else:
             ret, buffer = cv2.imencode('.jpg', frame)
@@ -57,12 +60,16 @@ def process_frame(frame):
     
     # Resize image to reduce size while maintaining aspect ratio
     height, width = frame.shape[:2]
+    
     max_dimension = 1080
     scale = max_dimension / max(height, width)
+    scale =10
     if scale < 1:
         new_width = int(width * scale)
         new_height = int(height * scale)
         frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_AREA)
+
+    resize_time = time.time() - start_time
     
     # Save frame temporarily for local 
     temp_path = 'temp_frame.jpg'
@@ -71,6 +78,7 @@ def process_frame(frame):
     cv2.imwrite(temp_path, frame)
     
     # Convert frame to base64 for API
+    
     _, img_encoded = cv2.imencode('.jpg', frame)
     img_base64 = base64.b64encode(img_encoded).decode('utf-8')
     
@@ -125,7 +133,8 @@ def process_frame(frame):
             'preprocessing_time': preprocessing_time,
             'api_inference_time': api_time,
             'total_time': total_time,
-            'time_difference': abs(local_time - api_time)
+            'time_difference': abs(local_time - api_time),
+            'resize_time': resize_time
         }
         
         return frame_with_predictions, {
@@ -190,18 +199,25 @@ def compare():
     return jsonify({'status': 'error', 'message': 'Failed to capture image'})
 
 @app.route('/fast_compare')
-def test():
+def fast_compare():
+    init_time = time.time()
     image_path = 'test_item.jpg'
     frame = cv2.imread(image_path)
     memory_size = frame.nbytes
     proced_frame,predilection = process_frame(frame)
+    
+    duration = time.time() - init_time
+    
     image_size=os.path.getsize(image_path)
     size_image= {
         "kb":image_size/1024,
         "mb":image_size/1024/1024,
         "memory_size": memory_size,
+        "ratio_bf":  frame.shape,
+        "ratio_af": proced_frame.shape,
         }
-    return jsonify({'predictions':predilection},{'size_image':size_image})
+    return jsonify({'predictions':predilection},{'size_image':size_image},
+    {'time': duration})
 
 @app.route('/video_feed')
 def video_feed():
@@ -226,20 +242,9 @@ def capture():
     
     return jsonify({'status': 'error', 'message': 'Failed to capture image'})
 
-@app.before_request
-def start_timer():
-    g.start_time = time.time()
-    g.request_size = int(request.content_length or 0)
 
-@app.after_request
-def log_bandwidth_usage(response):
-    duration = time.time() - g.start_time
-    response_size = response.calculate_content_length()
-    total = (g.request_size or 0) + (response_size or 0)
-    print(f"[BANDWIDTH] {request.method} {request.path} | Requête: {g.request_size} B | Réponse: {response_size} B | Total: {total / 1024:.2f} KB | Temps: {duration:.2f}s")
-    return response
 
 if __name__ == '__main__':
     load_dotenv()
 
-    app.run(debug=False, port=int(os.getenv('PORT',5002)))
+    app.run(debug=True, port=int(os.getenv('PORT',5002)))
